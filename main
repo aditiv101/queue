@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_SIZE 10
+// Structure to represent a customer
+typedef struct {
+    char name[30];
+    int partySize;
+} Customer;
+ 
+// Structure to represent a queue
+typedef struct {
+    Customer data[MAX_SIZE];
+    int front, rear;
+} Queue;
+ 
+// Function to initialize an empty queue
+void initializeQueue(Queue *queue) {
+    queue->front = -1;
+    queue->rear = -1;
+}
+ 
+// Function to check if the queue is empty
+int isQueueEmpty(Queue *queue) {
+    return (queue->front == -1);
+}
+ 
+// Function to check if the queue is full
+int isQueueFull(Queue *queue) {
+    return ((queue->rear + 1) % MAX_SIZE == queue->front);
+}
+ 
+// Function to add a customer to the queue
+void enqueue(Queue *queue, Customer customer) {
+    if (isQueueFull(queue)) {
+        printf("Queue is full. Cannot add more customers.\n");
+    } else {
+        if (isQueueEmpty(queue)) {
+            queue->front = 0;
+        }
+        queue->rear = (queue->rear + 1) % MAX_SIZE;
+        queue->data[queue->rear] = customer;
+        printf("%s and their party of %d have been added to the waiting list.\n", customer.name, customer.partySize);
+    }
+}
+// Function to remove a customer from the queue (serve the next customer)
+Customer dequeue(Queue *queue) {
+    Customer servedCustomer;
+    if (isQueueEmpty(queue)) {
+        printf("Queue is empty. No customers to serve.\n");
+        servedCustomer.partySize = 0; // Return a party size of 0 to indicate no customer
+    } else {
+        servedCustomer = queue->data[queue->front];
+        if (queue->front == queue->rear) {
+            // The last customer is being served; reset the queue
+            initializeQueue(queue);
+        } else {
+            queue->front = (queue->front + 1) % MAX_SIZE;
+        }
+        printf("%s and their party of %d have been served.\n", servedCustomer.name, servedCustomer.partySize);
+    }
+    return servedCustomer;
+}
+ 
+int main() {
+    Queue waitingList;
+    initializeQueue(&waitingList);
+    int choice;
+    printf("Welcome to the ADITI'S Cafe Waiting List System\n");
+    
+    do {
+        printf("\nOptions:\n");
+        printf("1. Add customer to waiting list\n");
+        printf("2. Serve the next customer\n");
+        printf("3. Quit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                Customer newCustomer;
+                printf("Enter customer's name: ");
+                scanf("%s", newCustomer.name);
+                printf("Enter the party size: ");
+                scanf("%d", &newCustomer.partySize);
+                enqueue(&waitingList, newCustomer);
+                break;
+            case 2:
+                dequeue(&waitingList);
+                break;
+            case 3:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        } } while (choice != 3);
+    return 0;}
